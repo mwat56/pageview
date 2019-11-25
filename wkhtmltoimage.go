@@ -58,7 +58,7 @@ type tImageOptions struct {
 //	`aOptions` The commandline options for `wkhtmltoimage`.
 func buildParams(aOptions *tImageOptions) (rList []string, rErr error) {
 	if 0 == len(aOptions.Input) {
-		return rList, errors.New("Input not set")
+		return rList, errors.New("Input not set") //lint:ignore ST1005 - I want his
 	}
 	if 0 == len(aOptions.BinaryPath) {
 		return rList, errors.New("BinaryPath not set")
@@ -97,7 +97,7 @@ func cleanupOutput(aImage []byte) []byte {
 		}
 		decoded, err = png.Decode(bytes.NewReader(aImage))
 	}
-	png.Encode(&buf, decoded)
+	_ = png.Encode(&buf, decoded)
 
 	return buf.Bytes()
 } // cleanupOutput()
@@ -117,7 +117,7 @@ func generateImage(aOptions *tImageOptions) (rImage []byte, rErr error) {
 
 	//TODO add context with timeout
 
-	cmd := exec.Command(aOptions.BinaryPath, flags...)
+	cmd := exec.Command(aOptions.BinaryPath, flags...) //#nosec G204
 	rawImage, rErr = cmd.CombinedOutput()
 	rImage = cleanupOutput(rawImage)
 
