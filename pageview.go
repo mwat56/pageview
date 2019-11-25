@@ -26,16 +26,23 @@ const (
 )
 
 var (
-	// Path/filename of the `wkhtmltoimage` executable
-	// (set be the `init()` function).
-	wkHTMLToImageBinary = ""
+	// Path/filename of the `wkhtmltoimage` executable.
+	wkHTMLToImageBinary = func() string {
+		if cmd, err := exec.LookPath(wkHTMLconverterBinary); nil == err {
+			return cmd
+		}
+		return ""
+	}()
 
 	// Max. age of cached page images (in seconds);
 	// `0` (zero) disables the age check.
 	wkImageAge time.Duration = 0
 
 	// Directory to store the generated images.
-	wkImageDirectory = ""
+	wkImageDirectory = func() string {
+		result, _ := filepath.Abs("./")
+		return result
+	}()
 
 	// RegEx to find all non alpha/digits in URLs.
 	wkReplaceNonAlphas = regexp.MustCompile(`\W+`)
@@ -64,14 +71,6 @@ func exists(aFilename string) bool {
 
 	return true
 } // exists()
-
-// `init()` tries to set the binary's path.
-func init() {
-	if cmd, err := exec.LookPath(wkHTMLconverterBinary); nil == err {
-		wkHTMLToImageBinary = cmd
-	}
-	wkImageDirectory, _ = filepath.Abs("./")
-} // init()
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
