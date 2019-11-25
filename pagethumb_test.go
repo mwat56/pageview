@@ -17,11 +17,13 @@ const (
 func TestPageThumb(t *testing.T) {
 	SetCacheDirectory(tmpImageDirectory)
 	u1 := "http://dev.mwat.de/"
-	n1 := ThumbCode(u1) + `.png`
+	n1 := sanitise(u1) + `.png`
 	u2 := "http://www.mwat.de/"
-	n2 := ThumbCode(u2) + `.png`
+	n2 := sanitise(u2) + `.png`
 	u3 := "http://www.mwat.de/index"
-	n3 := ThumbCode(u3) + `.png`
+	n3 := sanitise(u3) + `.png`
+	u4 := "http://matthias.mwat.de/index"
+	n4 := sanitise(u4) + `.png`
 
 	type args struct {
 		aURL string
@@ -36,12 +38,13 @@ func TestPageThumb(t *testing.T) {
 		{" 1", args{u1}, n1, false},
 		{" 2", args{u2}, n2, false},
 		{" 3", args{u3}, n3, false},
+		{" 4", args{u4}, n4, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Image(tt.args.aURL)
+			got, err := CreateImage(tt.args.aURL)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("PageThumb() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("PageThumb() error = %v,\nwantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
