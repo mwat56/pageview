@@ -1,0 +1,9 @@
+*~
+*.bak
+bin/
+.git/
+img/*
+*.ini
+*.log
+TODO*
+.vscode/
