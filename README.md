@@ -22,7 +22,7 @@ Those image files are stored locally and may be used several times.
 
 You can use `Go` to install this package for you:
 
-	go get -u github.com/mwat56/pagethumb
+	go get github.com/mwat56/pagethumb
 
 ## Usage
 
@@ -30,13 +30,11 @@ You can use `Go` to install this package for you:
 
 ## Libraries
 
-The following external libraries were used building `pagethumb`:
-
-* [go-wkhtmltoimage](github.com/ninetwentyfour/go-wkhtmltoimage)
-
-and the great comandline utility
+The great commandline utility
 
 * [wkhtmltopdf](https://wkhtmltopdf.org/downloads.html)
+
+is  **_required_**  for this package to work.
 
 ## Licence
 
