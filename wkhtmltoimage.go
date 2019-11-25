@@ -4,7 +4,7 @@
               EMail : <support@mwat.de>
 */
 
-package pagethumb
+package pageview
 
 //lint:file-ignore ST1017 - I prefer Yoda conditions
 

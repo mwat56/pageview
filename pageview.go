@@ -4,7 +4,7 @@
               EMail : <support@mwat.de>
 */
 
-package pagethumb
+package pageview
 
 //lint:file-ignore ST1017 - I prefer Yoda conditions
 
@@ -43,7 +43,7 @@ var (
 
 // `exists()` returns whether there is an usable file cached.
 //
-// This function uses the global `wkPageThumbAge` value to determine
+// This function uses the global `wkImageAge` value to determine
 // whether an already existing file is considered to be too old.
 func exists(aFilename string) bool {
 	fi, err := os.Stat(aFilename)

@@ -22,7 +22,7 @@ import (
 	"time"
 
 	"github.com/mwat56/apachelogger"
-	"github.com/mwat56/pagethumb"
+	"github.com/mwat56/pageview"
 )
 */
 

@@ -1,6 +1,6 @@
 /*
 
-Package pagethumb implements a web page link preview.
+Package pageview implements a web page link preview.
 
     Copyright © 2019 M.Watermann, 10247 Berlin, Germany
                     All rights reserved
@@ -21,6 +21,6 @@ along with this program. If not, see the
 for details.
 
 */
-package pagethumb
+package pageview
 
 /* _EoF_ */

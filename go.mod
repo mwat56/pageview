@@ -1,3 +1,3 @@
-module github.com/mwat56/pagethumb
+module github.com/mwat56/pageview
 
 go 1.13

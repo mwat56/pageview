@@ -4,7 +4,7 @@
               EMail : <support@mwat.de>
 */
 
-package pagethumb
+package pageview
 
 import (
 	"testing"
@@ -14,7 +14,7 @@ const (
 	tmpImageDirectory = "/tmp/"
 )
 
-func TestPageThumb(t *testing.T) {
+func TestCreateImage(t *testing.T) {
 	SetCacheDirectory(tmpImageDirectory)
 	SetMaxAge(60)
 	u1 := "http://dev.mwat.de/"
@@ -45,12 +45,12 @@ func TestPageThumb(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := CreateImage(tt.args.aURL)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("PageThumb() error = %v,\nwantErr %v", err, tt.wantErr)
+				t.Errorf("CreateImage() error = %v,\nwantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("PageThumb() = %v,\nwant %v", got, tt.want)
+				t.Errorf("CreateImage() = %v,\nwant %v", got, tt.want)
 			}
 		})
 	}
-} // TestPageThumb()
+} // TestCreateImage()

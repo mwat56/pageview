@@ -1,13 +1,13 @@
-# PageThumb
+# pageview
 
 [![golang](https://img.shields.io/badge/Language-Go-green.svg)](https://golang.org)
-[![GoDoc](https://godoc.org/github.com/mwat56/pagethumb?status.svg)](https://godoc.org/github.com/mwat56/pagethumb)
-[![Go Report](https://goreportcard.com/badge/github.com/mwat56/pagethumb)](https://goreportcard.com/report/github.com/mwat56/pagethumb)
-[![Issues](https://img.shields.io/github/issues/mwat56/pagethumb.svg)](https://github.com/mwat56/pagethumb/issues?q=is%3Aopen+is%3Aissue)
-[![Size](https://img.shields.io/github/repo-size/mwat56/pagethumb.svg)](https://github.com/mwat56/pagethumb/)
-[![Tag](https://img.shields.io/github/tag/mwat56/pagethumb.svg)](https://github.com/mwat56/pagethumb/tags)
-[![View examples](https://img.shields.io/badge/learn%20by-examples-0077b3.svg)](https://github.com/mwat56/pagethumb/blob/master/cmd/pagethumb.go)
-[![License](https://img.shields.io/github/mwat56/pagethumb.svg)](https://github.com/mwat56/pagethumb/blob/master/LICENSE)
+[![GoDoc](https://godoc.org/github.com/mwat56/pageview?status.svg)](https://godoc.org/github.com/mwat56/pageview)
+[![Go Report](https://goreportcard.com/badge/github.com/mwat56/pageview)](https://goreportcard.com/report/github.com/mwat56/pageview)
+[![Issues](https://img.shields.io/github/issues/mwat56/pageview.svg)](https://github.com/mwat56/pageview/issues?q=is%3Aopen+is%3Aissue)
+[![Size](https://img.shields.io/github/repo-size/mwat56/pageview.svg)](https://github.com/mwat56/pageview/)
+[![Tag](https://img.shields.io/github/tag/mwat56/pageview.svg)](https://github.com/mwat56/pageview/tags)
+[![View examples](https://img.shields.io/badge/learn%20by-examples-0077b3.svg)](https://github.com/mwat56/pageview/blob/master/app/pageview.go)
+[![License](https://img.shields.io/github/mwat56/pageview.svg)](https://github.com/mwat56/pageview/blob/master/LICENSE)
 
 ## Purpose
 
@@ -22,7 +22,7 @@ Those image files are stored locally and may be used several times.
 
 You can use `Go` to install this package for you:
 
-	go get github.com/mwat56/pagethumb
+	go get github.com/mwat56/pageview
 
 ## Usage
 
