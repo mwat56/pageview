@@ -1,157 +1,125 @@
-// Package wkhtmltoimage provides a simple wrapper around wkhtmltoimage (http://wkhtmltopdf.org/) binary.
-package wkhtmltoimage
+/*
+   Copyright © 2019 M.Watermann, 10247 Berlin, Germany
+                  All rights reserved
+              EMail : <support@mwat.de>
+*/
+
+package pagethumb
+
+//lint:file-ignore ST1017 - I prefer Yoda conditions
+
+/*
+	CREDITS:
+	This file is a modified/optimised version of
+		github.com/ninetwentyfour/go-wkhtmltoimage
+		Copyright (c) 2015 ninetwentyfour
+*/
 
 import (
 	"bytes"
 	"errors"
-	"image/jpeg"
 	"image/png"
 	"os/exec"
 	"strconv"
-	"strings"
 )
 
-// ImageOptions represent the options to generate the image.
-type ImageOptions struct {
-	// BinaryPath the path to your wkhtmltoimage binary. REQUIRED
+// tImageOptions represent the options to generate the image.
+type tImageOptions struct {
+	// BinaryPath is the path to your wkhtmltoimage binary. REQUIRED
 	//
-	// Must be absolute path e.g /usr/local/bin/wkhtmltoimage
+	// Must be an absolute path e.g `/usr/local/bin/wkhtmltoimage`.
 	BinaryPath string
-	// Input is the content to turn into an image. REQUIRED
+
+	// Height in pixels of the imaginary screen used to render.
 	//
-	// Can be a url (http://example.com), a local file (/tmp/example.html), or html as a string (send "-" and set the Html value)
-	Input string
-	// Format is the type of image to generate
-	//
-	// jpg, png, svg, bmp supported. Defaults to local wkhtmltoimage default
-	Format string
-	// Height is the height of the screen used to render in pixels.
-	//
-	// Default is calculated from page content. Default 0 (renders entire page top to bottom)
+	// Default is calculated from the page content;
+	// defaults to `0` (zero) which renders the entire page top to bottom.
 	Height int
-	// Width is the width of the screen used to render in pixels.
-	//
-	// Note that this is used only as a guide line. Default 1024
-	Width int
+
+	// Input is the URL to turn into an image. REQUIRED
+	Input string
+
 	// Quality determines the final image quality.
 	//
-	// Values supported between 1 and 100. Default is 94
+	// Values supported between `1` and `100`. Default is 94.
 	Quality int
-	// Html is a string of html to render into and image.
+
+	// Width in pixels of the imaginary screen used to render.
 	//
-	// Only needed to be set if Input is set to "-"
-	Html string
-	// Output controls how to save or return the image.
-	//
-	// Leave nil to return a []byte of the image. Set to a path (/tmp/example.png) to save as a file.
-	Output string
+	// Note that this is used only as a guide line.
+	// Default is 1024.
+	Width int
 }
 
-// GenerateImage creates an image from an input.
-// It returns the image ([]byte) and any error encountered.
-func GenerateImage(options *ImageOptions) ([]byte, error) {
-	arr, err := buildParams(options)
-	if err != nil {
-		return []byte{}, err
+// `buildParams()` takes the image options set by the user
+// and turns them into command flags for `wkhtmltoimage`.
+// It returns a list of command flags.
+//
+//	`aOptions` The commandline options for `wkhtmltoimage`.
+func buildParams(aOptions *tImageOptions) (rList []string, rErr error) {
+	if 0 == len(aOptions.Input) {
+		return rList, errors.New("Input not set")
+	}
+	if 0 == len(aOptions.BinaryPath) {
+		return rList, errors.New("BinaryPath not set")
 	}
 
-	if options.BinaryPath == "" {
-		return []byte{}, errors.New("BinaryPath not set")
+	rList = []string{
+		"-q", // silence extra `wkhtmltoimage` output
+		"--disable-plugins",
+		"--format",
+		wkImageFileType, // `PNG` format because it scales better.
 	}
-
-	cmd := exec.Command(options.BinaryPath, arr...)
-
-	if options.Html != "" {
-		cmd.Stdin = strings.NewReader(options.Html)
+	if 0 < aOptions.Height {
+		rList = append(rList, "--height", strconv.Itoa(aOptions.Height))
 	}
-
-	output, err := cmd.CombinedOutput()
-
-	trimmed := cleanupOutput(output, options.Format)
-
-	return trimmed, err
-}
-
-// buildParams takes the image options set by the user and turns them into command flags for wkhtmltoimage
-// It returns an array of command flags.
-func buildParams(options *ImageOptions) ([]string, error) {
-	a := []string{}
-
-	if options.Input == "" {
-		return []string{}, errors.New("Must provide input")
+	if 0 < aOptions.Width {
+		rList = append(rList, "--width", strconv.Itoa(aOptions.Width))
 	}
-
-	// silence extra wkhtmltoimage output
-	// might want to add --javascript-delay too?
-	a = append(a, "-q")
-	a = append(a, "--disable-plugins")
-
-	a = append(a, "--format")
-	if options.Format != "" {
-		a = append(a, options.Format)
-	} else {
-		a = append(a, "png")
+	if (0 < aOptions.Quality) && (101 > aOptions.Quality) {
+		rList = append(rList, "--quality", strconv.Itoa(aOptions.Quality))
 	}
+	rList = append(rList, aOptions.Input, "-")
 
-	if options.Height != 0 {
-		a = append(a, "--height")
-		a = append(a, strconv.Itoa(options.Height))
-	}
+	return
+} // buildParams()
 
-	if options.Width != 0 {
-		a = append(a, "--width")
-		a = append(a, strconv.Itoa(options.Width))
-	}
+// `cleanupOutput()` returns `aImage` with unneeded data removed.
+//
+//	`aImage` The raw image data to cleanup.
+func cleanupOutput(aImage []byte) []byte {
+	var buf bytes.Buffer
 
-	if options.Quality != 0 {
-		a = append(a, "--quality")
-		a = append(a, strconv.Itoa(options.Quality))
-	}
-
-	// url and output come last
-	if options.Input != "-" {
-		// make sure we dont pass stdin if we aren't expecting it
-		options.Html = ""
-	}
-
-	a = append(a, options.Input)
-
-	if options.Output == "" {
-		a = append(a, "-")
-	} else {
-		a = append(a, options.Output)
-	}
-
-	return a, nil
-}
-
-func cleanupOutput(img []byte, format string) []byte {
-	buf := new(bytes.Buffer)
-	switch {
-	case format == "png":
-		decoded, err := png.Decode(bytes.NewReader(img))
-		for err != nil {
-			img = img[1:]
-			if len(img) == 0 {
-				break
-			}
-			decoded, err = png.Decode(bytes.NewReader(img))
+	decoded, err := png.Decode(bytes.NewReader(aImage))
+	for nil != err {
+		if aImage = aImage[1:]; 0 == len(aImage) {
+			break
 		}
-		png.Encode(buf, decoded)
-		return buf.Bytes()
-	case format == "jpg":
-		decoded, err := jpeg.Decode(bytes.NewReader(img))
-		for err != nil {
-			img = img[1:]
-			if len(img) == 0 {
-				break
-			}
-			decoded, err = jpeg.Decode(bytes.NewReader(img))
-		}
-		jpeg.Encode(buf, decoded, nil)
-		return buf.Bytes()
-		// case format == "svg":
-		// 	return img
+		decoded, err = png.Decode(bytes.NewReader(aImage))
 	}
-	return img
-}
+	png.Encode(&buf, decoded)
+
+	return buf.Bytes()
+} // cleanupOutput()
+
+// `generateImage()` creates an image from an input.
+// It returns the image data and any error encountered.
+//
+//	`aOptions` The commandline options for `wkhtmltoimage`.
+func generateImage(aOptions *tImageOptions) (rImage []byte, rErr error) {
+	var (
+		flags    []string
+		rawImage []byte
+	)
+	if flags, rErr = buildParams(aOptions); rErr != nil {
+		return
+	}
+
+	//TODO add context with timeout
+
+	cmd := exec.Command(aOptions.BinaryPath, flags...)
+	rawImage, rErr = cmd.CombinedOutput()
+	rImage = cleanupOutput(rawImage)
+
+	return
+} // generateImage()
