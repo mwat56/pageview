@@ -16,13 +16,14 @@ const (
 
 func TestPageThumb(t *testing.T) {
 	SetCacheDirectory(tmpImageDirectory)
+	SetMaxAge(60)
 	u1 := "http://dev.mwat.de/"
 	n1 := sanitise(u1) + `.png`
 	u2 := "http://www.mwat.de/"
 	n2 := sanitise(u2) + `.png`
-	u3 := "http://www.mwat.de/index"
+	u3 := "http://www.mwat.de/index.pl"
 	n3 := sanitise(u3) + `.png`
-	u4 := "http://matthias.mwat.de/index"
+	u4 := "http://bla.mwat.de/index"
 	n4 := sanitise(u4) + `.png`
 
 	type args struct {

@@ -14,17 +14,15 @@ import (
 	"path/filepath"
 	"regexp"
 	"time"
-
-	h2i "github.com/ninetwentyfour/go-wkhtmltoimage"
 )
 
 const (
-	// Type/Format of the generated thumbnails.
-	// We use `PNG` format because it scales better.
-	wkImageFileType string = `png`
-
 	// Name of the binary tool.
 	wkHTMLconverterBinary = "wkhtmltoimage"
+
+	// Type/Format of the generated images.
+	// We use `PNG` format because it scales better.
+	wkImageFileType string = `png`
 )
 
 var (
@@ -32,14 +30,14 @@ var (
 	// (set be the `init()` function).
 	wkHTMLToImageBinary = ""
 
-	// Max. age of cached thumbnail images (in seconds);
+	// Max. age of cached page images (in seconds);
 	// `0` (zero) disables the age check.
-	wkPageThumbAge time.Duration = 0
+	wkImageAge time.Duration = 0
 
-	// Directory to store the generated thumbnails
-	wkPageThumbDirectory = ""
+	// Directory to store the generated images.
+	wkImageDirectory = ""
 
-	// RegEx to replace all non alpha/digits in URLs.
+	// RegEx to find all non alpha/digits in URLs.
 	wkReplaceNonAlphas = regexp.MustCompile(`\W+`)
 )
 
@@ -58,10 +56,10 @@ func exists(aFilename string) bool {
 		return false
 	}
 
-	if 0 < wkPageThumbAge {
-		maxTime := fi.ModTime().Add(wkPageThumbAge * time.Second)
+	if 0 < wkImageAge {
+		maxTime := fi.ModTime().Add(wkImageAge * time.Second)
 		// files too old are ignored
-		return maxTime.Before(time.Now())
+		return time.Now().Before(maxTime)
 	}
 
 	return true
@@ -72,24 +70,24 @@ func init() {
 	if cmd, err := exec.LookPath(wkHTMLconverterBinary); nil == err {
 		wkHTMLToImageBinary = cmd
 	}
-	wkPageThumbDirectory, _ = filepath.Abs("./")
+	wkImageDirectory, _ = filepath.Abs("./")
 } // init()
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-// CacheDirectory returns the directory to store the generated thumbnails.
+// CacheDirectory returns the directory to store the generated images.
 func CacheDirectory() string {
-	return wkPageThumbDirectory
+	return wkImageDirectory
 } // CacheDirectory()
 
 // SetCacheDirectory sets the directory to use for storing the
-// generated thumbnails returning an error if `aDirectory` can't be used.
+// generated images returning an error if `aDirectory` can't be used.
 //
-//	`aDirectory` The directory to store the generated thumbnails.
+//	`aDirectory` The directory to store the generated images.
 func SetCacheDirectory(aDirectory string) error {
 	dir, err := filepath.Abs(aDirectory)
 	if nil == err {
-		wkPageThumbDirectory = dir
+		wkImageDirectory = dir
 	}
 
 	return err
@@ -109,21 +107,20 @@ func CreateImage(aURL string) (string, error) {
 	}
 
 	result := sanitise(aURL) + `.` + wkImageFileType
-	fName := filepath.Join(wkPageThumbDirectory, result)
+	fName := filepath.Join(wkImageDirectory, result)
 	// Check whether we've already got an image:
 	if exists(fName) {
 		return result, nil
 	}
 
-	c := h2i.ImageOptions{
+	c := tImageOptions{
 		BinaryPath: wkHTMLToImageBinary,
-		Format:     wkImageFileType,
-		Height:     742, // empirically determined …
+		Height:     742,
 		Input:      aURL,
 		Quality:    100,
 		Width:      1024,
 	}
-	imageData, _ := h2i.GenerateImage(&c)
+	imageData, _ := generateImage(&c)
 
 	file, err := os.OpenFile(fName,
 		os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0640) // #nosec G302
@@ -141,7 +138,7 @@ func CreateImage(aURL string) (string, error) {
 
 // MaxAge returns the maximimum age of cached page images.
 func MaxAge() time.Duration {
-	return wkPageThumbAge
+	return wkImageAge
 } // MaxAge()
 
 // SetMaxAge sets the maximimum age of cached page images.
@@ -155,16 +152,16 @@ func MaxAge() time.Duration {
 //lint:ignore ST1011 - it's a proper argument's name
 func SetMaxAge(aLengthInSeconds time.Duration) {
 	if 0 < aLengthInSeconds {
-		wkPageThumbAge = aLengthInSeconds
+		wkImageAge = aLengthInSeconds
 	} else {
-		wkPageThumbAge = 0
+		wkImageAge = 0
 	}
 } // SetMaxAge()
 
 // PathFile returns the complete local path/file of `aURL`.
 func PathFile(aURL string) string {
-	fName := sanitise(aURL) + `.` + wkImageFileType
-	return filepath.Join(wkPageThumbDirectory, fName)
+	return filepath.Join(wkImageDirectory,
+		sanitise(aURL)+`.`+wkImageFileType)
 } // PathFile()
 
 // `sanitise()` returns `aURL` with all non alpha/digits removed.
