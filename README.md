@@ -13,10 +13,8 @@
 
 Sometimes go don't want just standard web links in your web pages but a preview image showing the page you`re linking to.
 That is where this small package comes in.
-It generates – by way of calling the [wkhtmltopdf](https://wkhtmltopdf.org/downloads.html) commandline utility – an image of the web page a given URL addresses.
-Those image files are stored locally and may be used several times.
-
-	//TODO
+It generates – by way of calling the external [wkhtmltopdf](https://wkhtmltopdf.org/index.html) commandline utility – an image of the web page a given URL addresses.
+Those image files are stored locally and may be used as often as you want.
 
 ## Installation
 
@@ -24,9 +22,32 @@ You can use `Go` to install this package for you:
 
 	go get github.com/mwat56/pageview
 
+After that you can `import` it the usual Go way to use the library.
+
 ## Usage
 
-	//TODO
+There are only two functions you have to worry about:
+
+	// SetCacheDirectory sets the directory to use for storing the
+	// generated images returning an error if `aDirectory` can't be used.
+	//
+	//	`aDirectory` The directory to store the generated images.
+	func SetCacheDirectory(aDirectory string) error { … }
+
+This function must be called before any other one to make sure the generated images end up where you want them to be.
+
+To actually create an image you'd call:
+
+	// CreateImage generates an image of `aURL` and stores it in
+	// `CacheDirectory` returning the file name of the saved image.
+	//
+	//	`aURL` The address of the web page to process.
+	func CreateImage(aURL string) (string, error) { … }
+
+The returned string is the name of the image file.
+If you combine it with the directory you passed to `SetCacheDirectory()` you get the complete path/filename to locally access the image.
+
+There are some more function which you will barely – if ever – need; for details refer to the [source code documentation](https://godoc.org/github.com/mwat56/pageview)
 
 ## Libraries
 
@@ -35,6 +56,9 @@ The great commandline utility
 * [wkhtmltopdf](https://wkhtmltopdf.org/downloads.html)
 
 is  **_required_**  for this package to work.
+
+Under Linux this utility is usually part of your distribution.
+If not, you can [download wkhtmltopdf](https://wkhtmltopdf.org/downloads.html) from the web and install it.
 
 ## Licence
 
