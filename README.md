@@ -1,4 +1,4 @@
-# pageview
+# PageView
 
 [![golang](https://img.shields.io/badge/Language-Go-green.svg)](https://golang.org)
 [![GoDoc](https://godoc.org/github.com/mwat56/pageview?status.svg)](https://godoc.org/github.com/mwat56/pageview)
@@ -9,9 +9,19 @@
 [![View examples](https://img.shields.io/badge/learn%20by-examples-0077b3.svg)](https://github.com/mwat56/pageview/blob/master/app/pageview.go)
 [![License](https://img.shields.io/github/mwat56/pageview.svg)](https://github.com/mwat56/pageview/blob/master/LICENSE)
 
+- [PageView](#pageview)
+	- [Purpose](#purpose)
+	- [Installation](#installation)
+	- [Usage](#usage)
+	- [Libraries](#libraries)
+	- [Credits](#credits)
+	- [Licence](#licence)
+
+----
+
 ## Purpose
 
-Sometimes go don't want just standard web links in your web pages but a preview image showing the page you`re linking to.
+Sometimes yoo don't want just standard web links in your web pages but a preview image showing the page you`re linking to.
 That is where this small package comes in.
 It generates – by way of calling the external [wkhtmltopdf](https://wkhtmltopdf.org/index.html) commandline utility – an image of the web page a given URL addresses.
 Those image files are stored locally and may be used as often as you want.
@@ -47,7 +57,7 @@ To actually create an image you'd call:
 The returned string is the name of the image file.
 If you combine it with the directory you passed to `SetCacheDirectory()` you get the complete path/filename to locally access the image.
 
-There are some more function which you will barely – if ever – need; for details refer to the [source code documentation](https://godoc.org/github.com/mwat56/pageview)
+There are some more functions which you will barely – if ever – need; for details refer to the [source code documentation](https://godoc.org/github.com/mwat56/pageview)
 
 ## Libraries
 
@@ -60,6 +70,11 @@ is  **_required_**  for this package to work.
 Under Linux this utility is usually part of your distribution.
 If not, you can [download wkhtmltopdf](https://wkhtmltopdf.org/downloads.html) from the web and install it.
 
+## Credits
+
+Part of the code (i.e. the file `wkhtmltoimage.go`) is a modified version of
+[go-wkhtmltoimage](https://github.com/ninetwentyfour/go-wkhtmltoimage), `Copyright (c) 2015 ninetwentyfour`
+
 ## Licence
 
         Copyright © 2019 M.Watermann, 10247 Berlin, Germany
@@ -71,3 +86,5 @@ If not, you can [download wkhtmltopdf](https://wkhtmltopdf.org/downloads.html) f
 > This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 >
 > You should have received a copy of the GNU General Public License along with this program. If not, see the [GNU General Public License](http://www.gnu.org/licenses/gpl.html) for details.
+
+----
