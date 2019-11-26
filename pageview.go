@@ -95,7 +95,7 @@ func SetCacheDirectory(aDirectory string) error {
 // CreateImage generates an image of `aURL` and stores it in
 // `CacheDirectory` returning the file name of the saved image.
 //
-//	`aURL` The address of the web page to receive.
+//	`aURL` The address of the web page to process.
 func CreateImage(aURL string) (string, error) {
 	if 0 == len(wkHTMLToImageBinary) {
 		// We can't do anything without the executable.
@@ -158,6 +158,9 @@ func SetMaxAge(aLengthInSeconds time.Duration) {
 } // SetMaxAge()
 
 // PathFile returns the complete local path/file of `aURL`.
+//
+// NOTE: This function does not check whether the file for `aURL`
+// actually exists in the local filesystem.
 func PathFile(aURL string) string {
 	return filepath.Join(wkImageDirectory,
 		sanitise(aURL)+`.`+wkImageFileType)
