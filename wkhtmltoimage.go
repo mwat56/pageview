@@ -19,6 +19,7 @@ import (
 	"bytes"
 	"errors"
 	"image/png"
+	"os"
 	"os/exec"
 	"strconv"
 )
@@ -65,10 +66,16 @@ func buildParams(aOptions *tImageOptions) (rList []string, rErr error) {
 	}
 
 	rList = []string{
-		"-q", // silence extra `wkhtmltoimage` output
+		"-q",
 		"--disable-plugins",
+		"--load-error-handling",
+		"ignore",
 		"--format",
 		wkImageFileType, // `PNG` format because it scales better.
+	}
+
+	if ucd, err := os.UserCacheDir(); (nil == err) && (0 < len(ucd)) {
+		rList = append(rList, "--cache-dir", ucd)
 	}
 	if 0 < aOptions.Height {
 		rList = append(rList, "--height", strconv.Itoa(aOptions.Height))
@@ -79,7 +86,7 @@ func buildParams(aOptions *tImageOptions) (rList []string, rErr error) {
 	if (0 < aOptions.Quality) && (101 > aOptions.Quality) {
 		rList = append(rList, "--quality", strconv.Itoa(aOptions.Quality))
 	}
-	rList = append(rList, aOptions.Input, "-")
+	rList = append(rList, aOptions.Input, "-") // i.e. StdOut
 
 	return
 } // buildParams()
