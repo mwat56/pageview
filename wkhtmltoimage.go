@@ -61,12 +61,12 @@ func buildParams(aURL string) (rList []string, rErr error) {
 	if 0 < wkImageWidth {
 		rList = append(rList, "--width", strconv.Itoa(wkImageWidth))
 	}
-	rList = append(rList, aURL, "-") // i.e. dara to StdOut
+	rList = append(rList, aURL, "-") // i.e. send data to StdOut
 
 	return
 } // buildParams()
 
-// `cleanupOutput()` returns `aImage` with unneeded data removed.
+// `cleanupOutput()` returns `aImage` with unneeded leading data removed.
 //
 //	`aImage` The raw image data to cleanup.
 func cleanupOutput(aImage []byte) []byte {
