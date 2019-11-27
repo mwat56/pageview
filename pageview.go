@@ -119,7 +119,12 @@ func CreateImage(aURL string) (string, error) {
 		Quality:    100,
 		Width:      1024,
 	}
-	imageData, _ := generateImage(&c)
+	imageData, err := generateImage(&c)
+	if nil != err {
+		// Either `wkhtmltoimage` produced an error
+		// or it took too long and was canceled.
+		return "", err
+	}
 
 	file, err := os.OpenFile(fName,
 		os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0640) // #nosec G302
