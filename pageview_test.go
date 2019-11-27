@@ -6,16 +6,14 @@
 
 package pageview
 
+//lint:file-ignore ST1017 - I prefer Yoda conditions
+
 import (
 	"testing"
 )
 
-const (
-	tmpImageDirectory = "/tmp/"
-)
-
 func TestCreateImage(t *testing.T) {
-	SetCacheDirectory(tmpImageDirectory)
+	SetImageDirectory("/tmp/")
 	SetMaxAge(60)
 	SetImageFileType(`png`)
 	u1 := "http://dev.mwat.de/"

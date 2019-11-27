@@ -53,14 +53,14 @@ var (
 	// Width of the image to generate.
 	wkImageWidth = 1024
 
-	// RegEx to find all non alpha/digits in URLs.
+	// R/O RegEx to find all non alpha/digits in URLs.
 	wkReplaceNonAlphas = regexp.MustCompile(`\W+`)
 )
 
 // `exists()` returns whether there is an usable file cached.
 //
-// This function uses the global `wkImageAge` value to determine
-// whether an already existing file is considered to be too old.
+// This function uses the `MaxAge()` value to determine whether
+// an already existing file is considered to be too old.
 func exists(aFilename string) bool {
 	fi, err := os.Stat(aFilename)
 	if (nil != err) || fi.IsDir() {
@@ -81,25 +81,14 @@ func exists(aFilename string) bool {
 	return true
 } // exists()
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-// CacheDirectory returns the directory used to store the generated images.
-func CacheDirectory() string {
-	return wkImageDirectory
-} // CacheDirectory()
-
-// SetCacheDirectory sets the directory to use for storing the
-// generated images, returning an error if `aDirectory` can't be used.
+// `sanitise()` returns `aURL` with all non alpha/digits removed.
 //
-//	`aDirectory` The directory to store the generated images.
-func SetCacheDirectory(aDirectory string) error {
-	dir, err := filepath.Abs(aDirectory)
-	if nil == err {
-		wkImageDirectory = dir
-	}
+//	`aURL` The URL to sanitise.
+func sanitise(aURL string) string {
+	return wkReplaceNonAlphas.ReplaceAllLiteralString(aURL, ``)
+} // sanitise()
 
-	return err
-} // SetCacheDirectory()
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 // CreateImage generates an image of `aURL` and stores it in
 // `CacheDirectory()`, returning the file name of the saved image.
@@ -148,6 +137,24 @@ func CreateImage(aURL string) (string, error) {
 	return result, nil
 } // CreateImage()
 
+// ImageDirectory returns the directory used to store the generated images.
+func ImageDirectory() string {
+	return wkImageDirectory
+} // ImageDirectory()
+
+// SetImageDirectory sets the directory to use for storing the
+// generated images, returning an error if `aDirectory` can't be used.
+//
+//	`aDirectory` The directory to store the generated images.
+func SetImageDirectory(aDirectory string) error {
+	dir, err := filepath.Abs(aDirectory)
+	if nil == err {
+		wkImageDirectory = dir
+	}
+
+	return err
+} // SetImageeDirectory()
+
 // ImageFileType returns the type of the image fles to generate.
 func ImageFileType() string {
 	return wkImageFileType
@@ -159,7 +166,7 @@ func ImageFileType() string {
 // selected.
 //
 // NOTE: Depending on how your `wkhtmltoimage` binary was compiled not
-// all formats may be supported.
+// all formats might be supported.
 //
 //	`aType` is the new desired type of the images to generate.
 func SetImageFileType(aType string) {
@@ -254,16 +261,11 @@ func SetMaxAge(aLengthInSeconds time.Duration) {
 //
 // NOTE: This function does not check whether the file for `aURL`
 // actually exists in the local filesystem.
+//
+//	`aURL` The address of the web page to process.
 func PathFile(aURL string) string {
 	return filepath.Join(wkImageDirectory,
 		sanitise(aURL)+`.`+wkImageFileType)
 } // PathFile()
-
-// `sanitise()` returns `aURL` with all non alpha/digits removed.
-//
-//	`aURL` The URL to sanitise.
-func sanitise(aURL string) string {
-	return wkReplaceNonAlphas.ReplaceAllLiteralString(aURL, ``)
-} // sanitise()
 
 /* _EoF_ */
