@@ -95,18 +95,21 @@ func buildParams(aOptions *tImageOptions) (rList []string, rErr error) {
 //
 //	`aImage` The raw image data to cleanup.
 func cleanupOutput(aImage []byte) []byte {
-	var buf bytes.Buffer
+	if 0 == len(aImage) {
+		return aImage
+	}
+	var buffer bytes.Buffer
 
 	decoded, err := png.Decode(bytes.NewReader(aImage))
 	for nil != err {
 		if aImage = aImage[1:]; 0 == len(aImage) {
-			break
+			return aImage
 		}
 		decoded, err = png.Decode(bytes.NewReader(aImage))
 	}
-	_ = png.Encode(&buf, decoded)
+	_ = png.Encode(&buffer, decoded)
 
-	return buf.Bytes()
+	return buffer.Bytes()
 } // cleanupOutput()
 
 // `generateImage()` creates an image from an input.
