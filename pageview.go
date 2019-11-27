@@ -19,10 +19,6 @@ import (
 const (
 	// Name of the binary tool.
 	wkHTMLconverterBinary = "wkhtmltoimage"
-
-	// Type/Format of the generated images.
-	// We use `PNG` format because it scales better.
-	wkImageFileType string = `png`
 )
 
 var (
@@ -43,6 +39,19 @@ var (
 		result, _ := filepath.Abs("./")
 		return result
 	}()
+
+	// Type/Format of the generated images.
+	// We use `PNG` format because it scales better.
+	wkImageFileType = `png`
+
+	// Height of the image to generate.
+	wkImageHeight = 768
+
+	// Quality of the image to generate.
+	wkImageQuality = 100
+
+	// Width of the image to generate.
+	wkImageWidth = 1024
 
 	// RegEx to find all non alpha/digits in URLs.
 	wkReplaceNonAlphas = regexp.MustCompile(`\W+`)
@@ -74,13 +83,13 @@ func exists(aFilename string) bool {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-// CacheDirectory returns the directory to store the generated images.
+// CacheDirectory returns the directory used to store the generated images.
 func CacheDirectory() string {
 	return wkImageDirectory
 } // CacheDirectory()
 
 // SetCacheDirectory sets the directory to use for storing the
-// generated images returning an error if `aDirectory` can't be used.
+// generated images, returning an error if `aDirectory` can't be used.
 //
 //	`aDirectory` The directory to store the generated images.
 func SetCacheDirectory(aDirectory string) error {
@@ -93,7 +102,7 @@ func SetCacheDirectory(aDirectory string) error {
 } // SetCacheDirectory()
 
 // CreateImage generates an image of `aURL` and stores it in
-// `CacheDirectory` returning the file name of the saved image.
+// `CacheDirectory()`, returning the file name of the saved image.
 //
 //	`aURL` The address of the web page to process.
 func CreateImage(aURL string) (string, error) {
@@ -107,19 +116,13 @@ func CreateImage(aURL string) (string, error) {
 
 	result := sanitise(aURL) + `.` + wkImageFileType
 	fName := filepath.Join(wkImageDirectory, result)
-	// Check whether we've already got an image:
+	// Check whether we've already got an image so
+	// we might avoid additional network traffic:
 	if exists(fName) {
 		return result, nil
 	}
 
-	c := tImageOptions{
-		BinaryPath: wkHTMLToImageBinary,
-		Height:     742,
-		Input:      aURL,
-		Quality:    100,
-		Width:      1024,
-	}
-	imageData, err := generateImage(&c)
+	imageData, err := generateImage(aURL)
 	if nil != err {
 		// Either `wkhtmltoimage` produced an error
 		// or it took too long and was canceled.
@@ -134,11 +137,96 @@ func CreateImage(aURL string) (string, error) {
 	defer file.Close()
 
 	if _, err := file.Write(imageData); nil != err {
+		// In case of errors during write we delete the file
+		// ignoring possible errors and return the write error.
+		_ = file.Close()
+		file = nil
+		_ = os.Remove(fName)
 		return "", err
 	}
 
 	return result, nil
 } // CreateImage()
+
+// ImageFileType returns the type of the image fles to generate.
+func ImageFileType() string {
+	return wkImageFileType
+} // ImageFileType()
+
+// SetImageFileType changes the type of the generated images.
+// The default type is `png`, the other options are `gif`, `jpg` and `svg`.
+// Passing an invalid value in `aType` will result in `png` being
+// selected.
+//
+// NOTE: Depending on how your `wkhtmltoimage` binary was compiled not
+// all formats may be supported.
+//
+//	`aType` is the new desired type of the images to generate.
+func SetImageFileType(aType string) {
+	switch aType {
+	case `gif`, `jpg`, `png`, `svg`:
+		wkImageFileType = aType
+	default:
+		wkImageFileType = `png`
+	}
+} // SetImageFileType()
+
+// ImageHeight is the height in pixels of the imaginary screen used to render.
+// The default value is `768`.
+//
+// The value `0` (zero) renders the entire page top to bottom,
+// calculating the actual height from the page content.
+func ImageHeight() int {
+	return wkImageHeight
+} // ImageHeight()
+
+// SetImageHeight sets the height of the images to generate.
+// The default value is `768`.
+//
+//	`aHeight` The new height of the images to generate.
+func SetImageHeight(aHeight int) {
+	if 0 < aHeight {
+		wkImageHeight = aHeight
+	} else {
+		wkImageHeight = 0
+	}
+} // SetImageHeight()
+
+// ImageQuality returns the desired image quality.
+func ImageQuality() int {
+	return wkImageQuality
+} // ImageQuality
+
+// SetImageQuality changes the quality of the genereated image.
+// Values supported between `1` and `100`; default is `100`.
+//
+//	`aQuality` the new desired image quality.
+func SetImageQuality(aQuality int) {
+	if (0 < aQuality) && (101 > aQuality) {
+		wkImageQuality = aQuality
+	} else {
+		wkImageQuality = 0 // i.e. ignore it
+	}
+} // SetImageQuality()
+
+// ImageWidth is the width in pixels of the imaginary screen used to render.
+// The default value is `1024`.
+// Note that this is used only as a guide line.
+func ImageWidth() int {
+	return wkImageWidth
+} // ImageWidth()
+
+// SetImageWidth sets the width of the images to generate.
+// The default value is `1024`.
+//
+//	`aWidth` The new width of the images to generate.
+func SetImageWidth(aWidth int) {
+	if 0 < aWidth {
+		wkImageWidth = aWidth
+	} else {
+		wkImageWidth = 0
+	}
+} // SetImageWidth()
 
 // MaxAge returns the maximimum age of cached page images.
 func MaxAge() time.Duration {

@@ -17,14 +17,15 @@ const (
 func TestCreateImage(t *testing.T) {
 	SetCacheDirectory(tmpImageDirectory)
 	SetMaxAge(60)
+	SetImageFileType(`png`)
 	u1 := "http://dev.mwat.de/"
-	n1 := sanitise(u1) + `.png`
+	n1 := sanitise(u1) + `.` + wkImageFileType
 	u2 := "http://www.mwat.de/"
-	n2 := sanitise(u2) + `.png`
+	n2 := sanitise(u2) + `.` + wkImageFileType
 	u3 := "http://www.mwat.de/index.pl"
-	n3 := sanitise(u3) + `.png`
+	n3 := sanitise(u3) + `.` + wkImageFileType
 	u4 := "http://bla.mwat.de/index"
-	n4 := sanitise(u4) + `.png`
+	n4 := sanitise(u4) + `.` + wkImageFileType
 
 	type args struct {
 		aURL string

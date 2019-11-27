@@ -54,10 +54,10 @@ To actually create an image you'd call:
 	//	`aURL` The address of the web page to process.
 	func CreateImage(aURL string) (string, error) { … }
 
-The returned string is the name of the image file.
-If you combine it with the directory you passed to `SetCacheDirectory()` you get the complete path/filename to locally access the image.
+The returned string is the name of the generated image file.
+If you combine it with the directory returned by `CacheDirectory()` you get the complete path/filename to locally access the image.
 
-There are some more functions which you will barely – if ever – need; for details refer to the [source code documentation](https://godoc.org/github.com/mwat56/pageview)
+There are a few more functions which you will barely need; for details refer to the [source code documentation](https://godoc.org/github.com/mwat56/pageview)
 
 ## Libraries
 
@@ -72,8 +72,7 @@ If not, you can [download wkhtmltopdf](https://wkhtmltopdf.org/downloads.html) f
 
 ## Credits
 
-Part of the code (i.e. the file `wkhtmltoimage.go`) is a modified version of
-[go-wkhtmltoimage](https://github.com/ninetwentyfour/go-wkhtmltoimage), `Copyright (c) 2015 ninetwentyfour`
+Part of the code (i.e. the file `wkhtmltoimage.go`) started as a modified version of [go-wkhtmltoimage](https://github.com/ninetwentyfour/go-wkhtmltoimage), `Copyright (c) 2015 ninetwentyfour`
 
 ## Licence
 
