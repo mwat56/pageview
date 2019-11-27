@@ -17,11 +17,13 @@ package pageview
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"image/png"
 	"os"
 	"os/exec"
 	"strconv"
+	"time"
 )
 
 // tImageOptions represent the options to generate the image.
@@ -58,8 +60,8 @@ type tImageOptions struct {
 //
 //	`aOptions` The commandline options for `wkhtmltoimage`.
 func buildParams(aOptions *tImageOptions) (rList []string, rErr error) {
-	if 0 == len(aOptions.Input) {
-		return rList, errors.New("Input not set") //lint:ignore ST1005 - I want his
+	if 0 == len(aOptions.Input) { //lint:ignore ST1005 - I want this
+		return rList, errors.New("Input not set")
 	}
 	if 0 == len(aOptions.BinaryPath) {
 		return rList, errors.New("BinaryPath not set")
@@ -125,11 +127,17 @@ func generateImage(aOptions *tImageOptions) (rImage []byte, rErr error) {
 		return
 	}
 
-	//TODO add context with timeout
-
-	cmd := exec.Command(aOptions.BinaryPath, flags...) //#nosec G204
-	rawImage, rErr = cmd.CombinedOutput()
-	rImage = cleanupOutput(rawImage)
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	// For some reason (e.g. network errors) `wkhtmltoimage` sometimes hangs
+	// – possibly indefinitely. Therefor we use a timeout to let the
+	// function continue.
+	defer cancel()
+	cmd := exec.CommandContext(ctx, aOptions.BinaryPath, flags...) //#nosec G204
+	if rawImage, rErr = cmd.Output(); nil != rawImage {
+		if rImage = cleanupOutput(rawImage); 0 < len(rImage) {
+			rErr = nil
+		}
+	}
 
 	return
 } // generateImage()
