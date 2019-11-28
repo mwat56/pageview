@@ -28,11 +28,11 @@ import (
 	"time"
 )
 
-// `buildParams()` takes the image options set by the user
-// and turns them into command flags for `wkhtmltoimage`.
-// It returns a list of command flags.
+// `buildParams()` takes `aURL` set by the user and prepares the
+// required commandline options for `wkhtmltoimage`, returning
+// the list of those options.
 //
-//	`aOptions` The commandline options for `wkhtmltoimage`.
+//	`aURL` The remote URL to be handled by `wkhtmltoimage`.
 func buildParams(aURL string) (rList []string, rErr error) {
 	if 0 == len(wkHTMLToImageBinary) {
 		return rList, errors.New("BinaryPath not set")
@@ -66,47 +66,48 @@ func buildParams(aURL string) (rList []string, rErr error) {
 	return
 } // buildParams()
 
-// `cleanupOutput()` returns `aImage` with unneeded leading data removed.
+// `cleanupOutput()` removes unneeded leading data from `aRawData`
+// and returns the properly encoded image.
 //
-//	`aImage` The raw image data to cleanup.
-func cleanupOutput(aImage []byte) []byte {
-	if 0 == len(aImage) {
-		return aImage
+//	`aRawData` The raw image data to cleanup.
+func cleanupOutput(aRawData []byte) []byte {
+	if 0 == len(aRawData) {
+		return aRawData
 	}
 	var buffer bytes.Buffer
 
 	switch wkImageFileType {
 	case `gif`:
-		opts := gif.Options{NumColors: wkImageQuality}
-		decoded, err := gif.Decode(bytes.NewReader(aImage))
+		decoded, err := gif.Decode(bytes.NewReader(aRawData))
 		for nil != err {
-			if aImage = aImage[1:]; 0 == len(aImage) {
-				return aImage
+			if aRawData = aRawData[1:]; 0 == len(aRawData) {
+				return aRawData
 			}
-			decoded, err = gif.Decode(bytes.NewReader(aImage))
+			decoded, err = gif.Decode(bytes.NewReader(aRawData))
 		}
+		opts := gif.Options{NumColors: wkImageQuality}
 		_ = gif.Encode(&buffer, decoded, &opts)
 		return buffer.Bytes()
 
 	case `jpg`:
-		opts := jpeg.Options{Quality: wkImageQuality}
-		decoded, err := jpeg.Decode(bytes.NewReader(aImage))
+		decoded, err := jpeg.Decode(bytes.NewReader(aRawData))
 		for nil != err {
-			if aImage = aImage[1:]; 0 == len(aImage) {
-				return aImage
+			if aRawData = aRawData[1:]; 0 == len(aRawData) {
+				return aRawData
 			}
-			decoded, err = jpeg.Decode(bytes.NewReader(aImage))
+			decoded, err = jpeg.Decode(bytes.NewReader(aRawData))
 		}
+		opts := jpeg.Options{Quality: wkImageQuality}
 		_ = jpeg.Encode(&buffer, decoded, &opts)
 		return buffer.Bytes()
 
 	case `png`:
-		decoded, err := png.Decode(bytes.NewReader(aImage))
+		decoded, err := png.Decode(bytes.NewReader(aRawData))
 		for nil != err {
-			if aImage = aImage[1:]; 0 == len(aImage) {
-				return aImage
+			if aRawData = aRawData[1:]; 0 == len(aRawData) {
+				return aRawData
 			}
-			decoded, err = png.Decode(bytes.NewReader(aImage))
+			decoded, err = png.Decode(bytes.NewReader(aRawData))
 		}
 		_ = png.Encode(&buffer, decoded)
 		return buffer.Bytes()
@@ -115,34 +116,36 @@ func cleanupOutput(aImage []byte) []byte {
 		// nothing to do here
 	}
 
-	return aImage
+	return aRawData
 } // cleanupOutput()
 
 // `generateImage()` creates an image from an input.
 // It returns the image data and any error encountered.
 //
-//	`aOptions` The commandline options for `wkhtmltoimage`.
+//	`aURL` The remote URL to be handled by `wkhtmltoimage`.
 func generateImage(aURL string) (rImage []byte, rErr error) {
 	var (
-		flags    []string
-		rawImage []byte
+		options []string
+		rawData []byte
 	)
-	if flags, rErr = buildParams(aURL); rErr != nil {
+	if options, rErr = buildParams(aURL); rErr != nil {
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	// For some reason (e.g. network errors) `wkhtmltoimage` sometimes
 	// hangs – possibly indefinitely. Therefor we use a timeout to let
 	// this function continue. The timeout value should be long enough
 	// to allow running both `exec.CommandContext()` and `cmd.Output()`.
 	defer cancel()
-	cmd := exec.CommandContext(ctx, wkHTMLToImageBinary, flags...) //#nosec G204
-	if rawImage, rErr = cmd.Output(); nil != rawImage {
-		if rImage = cleanupOutput(rawImage); 0 < len(rImage) {
+	cmd := exec.CommandContext(ctx, wkHTMLToImageBinary, options...) //#nosec G204
+	if rawData, rErr = cmd.Output(); nil != rawData {
+		if rImage = cleanupOutput(rawData); 0 < len(rImage) {
 			rErr = nil
 		}
 	}
 
 	return
 } // generateImage()
+
+/* _EoF_ */
