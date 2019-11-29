@@ -9,10 +9,12 @@ package pageview
 //lint:file-ignore ST1017 - I prefer Yoda conditions
 
 import (
+	"errors"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"time"
 )
 
@@ -22,6 +24,9 @@ const (
 )
 
 var (
+	// R/O RegEx to extract a file's extension.
+	wkExtRE = regexp.MustCompile(`(\.\w+)(\?.*)?$`)
+
 	// Path/filename of the `wkhtmltoimage` executable.
 	wkHTMLToImageBinary = func() string {
 		if cmd, err := exec.LookPath(wkHTMLconverterBinary); nil == err {
@@ -54,7 +59,7 @@ var (
 	wkImageWidth = 1024
 
 	// R/O RegEx to find all non alpha/digits in URLs.
-	wkReplaceNonAlphas = regexp.MustCompile(`\W+`)
+	wkReplaceNonAlphasRE = regexp.MustCompile(`\W+`)
 )
 
 // `exists()` returns whether there is an usable file cached.
@@ -81,11 +86,23 @@ func exists(aFilename string) bool {
 	return true
 } // exists()
 
+// `fileExt()` returns the filename extension of `aURL`.
+//
+//	`aURL` The URL to process.
+func fileExt(aURL string) string {
+	result := wkExtRE.FindStringSubmatch(aURL)
+	if 1 < len(result) {
+		return result[1]
+	}
+
+	return ""
+} // fileExt()
+
 // `sanitise()` returns `aURL` with all non alpha/digits removed.
 //
 //	`aURL` The URL to sanitise.
 func sanitise(aURL string) string {
-	return wkReplaceNonAlphas.ReplaceAllLiteralString(aURL, ``)
+	return wkReplaceNonAlphasRE.ReplaceAllLiteralString(aURL, ``)
 } // sanitise()
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -101,6 +118,23 @@ func CreateImage(aURL string) (string, error) {
 			Name: wkHTMLconverterBinary,
 			Err:  exec.ErrNotFound,
 		}
+	}
+
+	// exclude certain filetypes from preview generation
+	switch strings.ToLower(fileExt(aURL)) {
+	case ".amr", ".avi", ".azw3", ".bak", ".bibtex", ".bz2",
+		".cfg", ".com", ".conf", ".css", ".csv",
+		".db", ".deb", ".doc", ".docx", ".dia", ".epub", ".exe",
+		".flv", ".gz", ".ics", ".iso",
+		".jar", ".jpeg", ".jpg", ".json",
+		".mobi", ".mp3", ".mp4", ".mpeg",
+		".odf", ".odg", ".odp", ".ods", ".odt", ".otf", ".oxt",
+		".pas", ".pdf", ".pl", ".ppd", ".ppt", ".pptx",
+		".rip", ".rpm", ".sh", ".spk", ".sql", ".sxg", ".sxw",
+		".ttf", ".vbox", ".vmdk", ".vcs", ".wav",
+		".xhtml", ".xls", ".xpi", ".xsl", ".zip":
+		return "", errors.New("Excluded filename extension")
+	default:
 	}
 
 	result := sanitise(aURL) + `.` + wkImageFileType
