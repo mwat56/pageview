@@ -22,9 +22,11 @@ import (
 	"image/gif"
 	"image/jpeg"
 	"image/png"
+	"log"
 	"os"
 	"os/exec"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -44,8 +46,11 @@ func buildParams(aURL string) (rList []string, rErr error) {
 	rList = []string{
 		"-q",
 		"--disable-plugins",
+		"--disable-smart-width",
 		"--load-error-handling",
 		"ignore",
+		"--zoom",
+		"1.1",
 		"--format",
 		wkImageFileType,
 	}
@@ -140,6 +145,9 @@ func generateImage(aURL string) (rImage []byte, rErr error) {
 	defer cancel()
 	cmd := exec.CommandContext(ctx, wkHTMLToImageBinary, options...) //#nosec G204
 	if rawData, rErr = cmd.Output(); nil != rawData {
+		if nil != rErr {
+			log.Println(wkHTMLToImageBinary, strings.Join(options, " "), rErr)
+		}
 		if rImage = cleanupOutput(rawData); 0 < len(rImage) {
 			rErr = nil
 		}
