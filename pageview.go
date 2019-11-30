@@ -121,22 +121,26 @@ func CreateImage(aURL string) (string, error) {
 	}
 
 	// exclude certain filetypes from preview generation
-	switch strings.ToLower(fileExt(aURL)) {
-	case ".amr", ".avi", ".azw3", ".bak", ".bibtex", ".bz2",
-		".cfg", ".com", ".conf", ".css", ".csv",
-		".db", ".deb", ".doc", ".docx", ".dia", ".epub", ".exe",
-		".flv", ".gz", ".ics", ".iso",
-		".jar", ".jpeg", ".jpg", ".json",
-		".mobi", ".mp3", ".mp4", ".mpeg",
-		".odf", ".odg", ".odp", ".ods", ".odt", ".otf", ".oxt",
-		".pas", ".pdf", ".pl", ".ppd", ".ppt", ".pptx",
-		".rip", ".rpm", ".sh", ".spk", ".sql", ".sxg", ".sxw",
-		".ttf", ".vbox", ".vmdk", ".vcs", ".wav",
-		".xhtml", ".xls", ".xpi", ".xsl", ".zip":
-		return "", errors.New("Excluded filename extension")
-	default:
-	}
+	if ext := strings.ToLower(fileExt(aURL)); 0 < len(ext) {
+		switch ext {
+		case ".amr", ".arj", ".avi", ".azw3",
+			".bak", ".bibtex", ".bz2",
+			".cfg", ".com", ".conf", ".css", ".csv",
+			".db", ".deb", ".doc", ".docx", ".dia", ".epub",
+			".exe", ".flv", ".gz", ".ics", ".iso",
+			".jar", ".jpeg", ".jpg", ".json",
+			".md", ".mobi", ".mp3", ".mp4", ".mpeg",
+			".odf", ".odg", ".odp", ".ods", ".odt", ".otf", ".oxt",
+			".pas", ".pdf", ".pl", ".ppd", ".ppt", ".pptx",
+			".rip", ".rpm", ".sh", ".spk", ".sql", ".sxg", ".sxw",
+			".ttf", ".vbox", ".vmdk", ".vcs", ".wav",
+			".xls", ".xpi", ".xsl", ".zip":
+			return "", errors.New("Excluded filename extension: " + ext)
 
+		default:
+			// nothing to do …
+		}
+	}
 	result := sanitise(aURL) + `.` + wkImageFileType
 	fName := filepath.Join(wkImageDirectory, result)
 	// Check whether we've already got an image so
@@ -274,7 +278,8 @@ func MaxAge() time.Duration {
 	return wkImageAge
 } // MaxAge()
 
-// SetMaxAge sets the maximimum age of cached page images.
+// SetMaxAge sets the maximum age of cached page images
+// before they might get updated.
 //
 // Usually you want this property at its default value (`0`, zero)
 // which disables an age check because you want an image of the page

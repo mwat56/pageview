@@ -26,6 +26,7 @@ func Test_fileExt(t *testing.T) {
 		{" 4", args{"document.txt.doc"}, ".doc"},
 		{" 5", args{"http://example.com/page.html?view=print"}, ".html"},
 		{" 6", args{"http://example.com/sometopic?show=all&lang=en"}, ""},
+		{" 5", args{"http://example.com/page.md?view=print#top"}, ".md"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
