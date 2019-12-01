@@ -25,7 +25,7 @@ const (
 
 var (
 	// R/O RegEx to extract a file's extension.
-	wkExtRE = regexp.MustCompile(`(\.\w+)(\?.*)?$`)
+	wkExtRE = regexp.MustCompile(`(\.\w+)([\?\#].*)?$`)
 
 	// Path/filename of the `wkhtmltoimage` executable.
 	wkHTMLToImageBinary = func() string {
@@ -108,7 +108,7 @@ func sanitise(aURL string) string {
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 // CreateImage generates an image of `aURL` and stores it in
-// `CacheDirectory()`, returning the file name of the saved image.
+// `ImageDirectory()`, returning the file name of the saved image.
 //
 //	`aURL` The address of the web page to process.
 func CreateImage(aURL string) (string, error) {
