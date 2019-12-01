@@ -27,6 +27,7 @@ func Test_fileExt(t *testing.T) {
 		{" 5", args{"http://example.com/page.html?view=print"}, ".html"},
 		{" 6", args{"http://example.com/sometopic?show=all&lang=en"}, ""},
 		{" 5", args{"http://example.com/page.md?view=print#top"}, ".md"},
+		{" 6", args{"https://github.com/mwat56/Nele/blob/master/README.md#nele-blog"}, ".md"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -47,7 +48,6 @@ func TestCreateImage(t *testing.T) {
 	n2 := sanitise(u2) + `.` + wkImageFileType
 	u3 := "http://www.mwat.de/index.pl"
 	u4 := "http://bla.mwat.de/index.shtml"
-	n4 := sanitise(u4) + `.` + wkImageFileType
 
 	type args struct {
 		aURL string
@@ -62,7 +62,7 @@ func TestCreateImage(t *testing.T) {
 		{" 1", args{u1}, n1, false},
 		{" 2", args{u2}, n2, false},
 		{" 3", args{u3}, "", true},
-		{" 4", args{u4}, n4, false},
+		{" 4", args{u4}, "", true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
