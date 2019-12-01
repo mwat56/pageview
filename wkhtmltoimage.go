@@ -124,7 +124,7 @@ func cleanupOutput(aRawData []byte) []byte {
 	return aRawData
 } // cleanupOutput()
 
-// `generateImage()` creates an image from an input.
+// `generateImage()` creates an image from `aURL`.
 // It returns the image data and any error encountered.
 //
 //	`aURL` The remote URL to be handled by `wkhtmltoimage`.
