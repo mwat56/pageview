@@ -60,6 +60,9 @@ var (
 
 	// R/O RegEx to find all non alpha/digits in URLs.
 	wkReplaceNonAlphasRE = regexp.MustCompile(`\W+`)
+
+	// User Agent to use when queing external sites.
+	wkUserAgent string
 )
 
 // `exists()` returns whether there is an usable file cached.
@@ -306,5 +309,23 @@ func PathFile(aURL string) string {
 	return filepath.Join(wkImageDirectory,
 		sanitise(aURL)+`.`+wkImageFileType)
 } // PathFile()
+
+// UserAgent returns the current `User Agent` setting.
+func UserAgent() string {
+	return wkUserAgent
+} // UserAgent()
+
+// SetUserAgent changes the current `User Agent` setting to `aAgent`.
+//
+// Note: This only affects the HTTP header send to the remote host.
+// Unfortunately, there is no way to change the `navigator.userAgent`
+// setting by a commandline argument.
+// So sites requesting that value will still see the hardcoded
+// `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/534.34 (KHTML, like Gecko) wkhtmltoimage Safari/534.34`.
+//
+//	`aAgent` The new `User Agent` setting.
+func SetUserAgent(aAgent string) {
+	wkUserAgent = aAgent
+} // SetUserAgent()
 
 /* _EoF_ */

@@ -54,6 +54,15 @@ func buildParams(aURL string) (rList []string, rErr error) {
 		"--format",
 		wkImageFileType,
 	}
+	if 0 < len(wkUserAgent) {
+		// see: https://github.com/wkhtmltopdf/wkhtmltopdf/issues/2020
+		rList = append(rList, "--custom-header",
+			"User-Agent", wkUserAgent, "--custom-header-propagation")
+		// Unfortunately, there is no way to change the
+		// `navigator.userAgent` setting by a commandline argument.
+		// So sites requesting that value will still see
+		// `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/534.34 (KHTML, like Gecko) wkhtmltoimage Safari/534.34`.
+	}
 	if ucd, err := os.UserCacheDir(); (nil == err) && (0 < len(ucd)) {
 		rList = append(rList, "--cache-dir", ucd)
 	}
