@@ -7,9 +7,12 @@
 package pageview
 
 //lint:file-ignore ST1017 - I prefer Yoda conditions
+//lint:file-ignore ST1005 - I prefer Capitalisation
 
 import (
 	"errors"
+	"io"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -29,6 +32,7 @@ var (
 
 	// Path/filename of the `wkhtmltoimage` executable.
 	wkHTMLToImageBinary = func() string {
+		// Check whether we can find the binary:
 		if cmd, err := exec.LookPath(wkHTMLconverterBinary); nil == err {
 			return cmd
 		}
@@ -39,7 +43,8 @@ var (
 	// `0` (zero) disables the age check.
 	wkImageAge time.Duration = 0
 
-	// Directory to store the generated images.
+	// Directory to store the generated images;
+	// defaults to the current path/directory.
 	wkImageDirectory = func() string {
 		result, _ := filepath.Abs("./")
 		return result
@@ -123,27 +128,6 @@ func CreateImage(aURL string) (string, error) {
 		}
 	}
 
-	// exclude certain filetypes from preview generation
-	if ext := strings.ToLower(fileExt(aURL)); 0 < len(ext) {
-		switch ext {
-		case ".amr", ".arj", ".avi", ".azw3",
-			".bak", ".bibtex", ".bz2",
-			".cfg", ".com", ".conf", ".css", ".csv",
-			".db", ".deb", ".doc", ".docx", ".dia", ".epub",
-			".exe", ".flv", ".gz", ".ics", ".iso",
-			".jar", ".jpeg", ".jpg", ".json",
-			".md", ".mobi", ".mp3", ".mp4", ".mpeg",
-			".odf", ".odg", ".odp", ".ods", ".odt", ".otf", ".oxt",
-			".pas", ".pdf", ".pl", ".ppd", ".ppt", ".pptx",
-			".rip", ".rpm", ".sh", ".spk", ".sql", ".sxg", ".sxw",
-			".ttf", ".vbox", ".vmdk", ".vcs", ".wav",
-			".xls", ".xpi", ".xsl", ".zip":
-			return "", errors.New("Excluded filename extension: " + ext)
-
-		default:
-			// nothing to do …
-		}
-	}
 	result := sanitise(aURL) + `.` + wkImageFileType
 	fName := filepath.Join(wkImageDirectory, result)
 	// Check whether we've already got an image so
@@ -152,11 +136,44 @@ func CreateImage(aURL string) (string, error) {
 		return result, nil
 	}
 
-	imageData, err := generateImage(aURL)
-	if nil != err {
-		// Either `wkhtmltoimage` produced an error
-		// or it took too long and was canceled.
-		return "", err
+	var (
+		// Declare variables here so we can use them in different
+		// contexts/closures below.
+		err       error
+		imageData []byte
+		response  *http.Response
+	)
+
+	// Exclude certain filetypes from preview generation:
+	ext := strings.ToLower(fileExt(aURL))
+	switch ext {
+	case ".amr", ".arj", ".avi", ".azw3",
+		".bak", ".bibtex", ".bz2",
+		".cfg", ".com", ".conf", ".css", ".csv",
+		".db", ".deb", ".doc", ".docx", ".dia",
+		".epub", ".exe", ".flv", ".gz",
+		".ics", ".iso", ".jar", ".json",
+		".md", ".mobi", ".mp3", ".mp4", ".mpeg",
+		".odf", ".odg", ".odp", ".ods", ".odt", ".otf", ".oxt",
+		".pas", ".pdf", ".pl", ".ppd", ".ppt", ".pptx",
+		".rip", ".rpm",
+		".sh", ".spk", ".sql", ".sxg", ".sxw",
+		".ttf", ".vbox", ".vmdk", ".vcs", ".wav",
+		".xls", ".xpi", ".xsl", ".zip":
+		return "", errors.New("Excluded filename extension: " + ext)
+
+	case ".gif", ".jpeg", ".jpg", ".png", ".svg":
+		if response, err = http.Get(aURL); /* #nosec G107 */ nil != err {
+			return "", err
+		}
+		defer response.Body.Close()
+
+	default:
+		if imageData, err = generateImage(aURL); nil != err {
+			// Either `wkhtmltoimage` produced an error
+			// or it took too long and was canceled.
+			return "", err
+		}
 	}
 
 	file, err := os.OpenFile(fName,
@@ -166,7 +183,15 @@ func CreateImage(aURL string) (string, error) {
 	}
 	defer file.Close()
 
-	if _, err := file.Write(imageData); nil != err {
+	if 0 < len(imageData) {
+		_, err = file.Write(imageData)
+	} else if (nil != response) && (0 < response.ContentLength) {
+		_, err = io.Copy(file, response.Body)
+	} else {
+		return "", errors.New("No image data received")
+	}
+
+	if nil != err {
 		// In case of errors during write we delete the file
 		// ignoring possible errors and return the write error.
 		_ = file.Close()
@@ -175,6 +200,7 @@ func CreateImage(aURL string) (string, error) {
 		return "", err
 	}
 
+	// Everything went well!
 	return result, nil
 } // CreateImage()
 
