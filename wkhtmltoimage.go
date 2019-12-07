@@ -146,7 +146,7 @@ func generateImage(aURL string) (rImage []byte, rErr error) {
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	// For some reason (e.g. network errors) `wkhtmltoimage` sometimes
 	// hangs – possibly indefinitely. Therefor we use a timeout to let
 	// this function continue. The timeout value should be long enough
