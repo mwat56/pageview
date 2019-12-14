@@ -149,7 +149,7 @@ func CreateImage(aURL string) (string, error) {
 	switch ext {
 	case ".amr", ".arj", ".avi", ".azw3",
 		".bak", ".bibtex", ".bz2",
-		".cfg", ".com", ".conf", ".css", ".csv",
+		".cfg", ".com", ".conf", ".csv",
 		".db", ".deb", ".doc", ".docx", ".dia",
 		".epub", ".exe", ".flv", ".gz",
 		".ics", ".iso", ".jar", ".json",
