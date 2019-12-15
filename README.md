@@ -23,7 +23,7 @@
 
 Sometimes yoo don't want just standard web links in your web pages but a preview image showing the page you`re linking to.
 That is where this small package comes in.
-It generates – by way of calling the external [wkhtmltopdf](https://wkhtmltopdf.org/index.html) commandline utility – an image of the web page a given URL addresses.
+It generates – by way of calling the external [wkhtmltoimage](https://wkhtmltopdf.org/index.html) commandline utility – an image of the web page a given URL addresses.
 Those image files are stored locally and may be used as often as you want.
 
 ## Installation
@@ -57,18 +57,24 @@ To actually create an image you'd call:
 The returned string is the name of the generated image file.
 If you combine it with the directory returned by `CacheDirectory()` you get the complete path/filename to locally access the image.
 
+Generating a preview image usually takes between one and five seconds, depending on the actual web-page in question, however, it can take considerably longer.
+To avoid hanging the program the `wkhtmltoimage` utulity is called with an one minute timeout.
+
+And, finally, not all web-pages can be rendered properly and turned into an image.
+In such case `wkhtmltoimage` just crashes and `CreateImage()` doesn't return a filename but an error.
+
 There are a few more functions which you will barely need; for details refer to the [source code documentation](https://godoc.org/github.com/mwat56/pageview)
 
 ## Libraries
 
 The great commandline utility
 
-* [wkhtmltopdf](https://wkhtmltopdf.org/downloads.html)
+* [wkhtmltoimage](https://wkhtmltopdf.org/downloads.html)
 
 is  **_required_**  for this package to work.
 
 Under Linux this utility is usually part of your distribution.
-If not, you can [download wkhtmltopdf](https://wkhtmltopdf.org/downloads.html) from the web and install it.
+If not, you can [download wkhtmltoimage](https://wkhtmltopdf.org/downloads.html) from the web and install it.
 
 ## Credits
 
