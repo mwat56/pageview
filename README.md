@@ -75,6 +75,8 @@ is  **_required_**  for this package to work.
 
 Under Linux this utility is usually part of your distribution.
 If not, you can [download wkhtmltoimage](https://wkhtmltopdf.org/downloads.html) from the web and install it.
+Usually the package from the download page above is more recent than the version in your Linux distribution.
+If in doubt, I'd suggest to test both versions to determine which one works best for you.
 
 ## Credits
 
