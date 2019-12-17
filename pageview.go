@@ -80,8 +80,13 @@ func exists(aFilename string) bool {
 		return false
 	}
 
-	if 0 >= fi.Size() {
-		// empty files are ignored
+	if 10240 > fi.Size() {
+		// Empty and small (< 10KB) files are ignored.
+		// File sizes smaller than ~10KB indicate some kind of
+		// error during retrieval of the web page or rendering it.
+		// Valid preview images take approximately between 10 to 100 KB
+		// depending on the respective web page (e.g. number and size
+		// of embedded images).
 		return false
 	}
 
