@@ -30,6 +30,14 @@ import (
 	"time"
 )
 
+var (
+	// Lookup table for JavaScript setting.
+	wkLookupJS = map[bool]string{
+		true:  `--enable-javascript`,
+		false: `--disable-javascript`,
+	}
+)
+
 // `buildParams()` takes `aURL` set by the user and prepares the
 // required commandline options for `wkhtmltoimage`, returning
 // the list of those options.
@@ -44,7 +52,7 @@ func buildParams(aURL string) (rList []string, rErr error) {
 	}
 
 	rList = []string{
-		"-q",
+		"--quiet",
 		"--disable-plugins",
 		"--disable-smart-width",
 		"--load-error-handling",
@@ -75,7 +83,9 @@ func buildParams(aURL string) (rList []string, rErr error) {
 	if 0 < wkImageWidth {
 		rList = append(rList, "--width", strconv.Itoa(wkImageWidth))
 	}
-	rList = append(rList, aURL, "-") // i.e. send data to StdOut
+	rList = append(rList, wkLookupJS[wkJavaScript],
+		aURL, // the page to retrieve
+		"-")  // i.e. send data to StdOut
 
 	return
 } // buildParams()

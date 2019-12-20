@@ -63,6 +63,9 @@ var (
 	// Width of the image to generate.
 	wkImageWidth = 1024
 
+	// Flag whether to allow JavaScript in retrieved pages.
+	wkJavaScript bool
+
 	// R/O RegEx to find all non alpha/digits in URLs.
 	wkReplaceNonAlphasRE = regexp.MustCompile(`\W+`)
 
@@ -121,7 +124,8 @@ func sanitise(aURL string) string {
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 // CreateImage generates an image of `aURL` and stores it in
-// `ImageDirectory()`, returning the file name of the saved image.
+// `ImageDirectory()`, returning the file name of the saved image
+// or an error in case of problems.
 //
 //	`aURL` The address of the web page to process.
 func CreateImage(aURL string) (string, error) {
@@ -306,6 +310,21 @@ func SetImageWidth(aWidth int) {
 		wkImageWidth = 0
 	}
 } // SetImageWidth()
+
+// JavaScript returns whether to allow JavaScript during page retrieval;
+// defaults to `false` for safety and speed reasons.
+func JavaScript() bool {
+	return wkJavaScript
+} // JavaScript()
+
+// SetJavaScript determines whether to allow JavaScript during page
+// retrieval or not.
+//
+//	`doAllow` If `false` (i.e. the default) no JavaScript will be available
+// during page retrievel, otherwise (i.e. `true`) it will be activated.
+func SetJavaScript(doAllow bool) {
+	wkJavaScript = doAllow
+} // SetJavaScript()
 
 // MaxAge returns the maximimum age of cached page images.
 func MaxAge() time.Duration {
