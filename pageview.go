@@ -164,9 +164,8 @@ func CreateImage(aURL string) (string, error) {
 		".ics", ".iso", ".jar", ".json",
 		".md", ".mobi", ".mp3", ".mp4", ".mpeg",
 		".odf", ".odg", ".odp", ".ods", ".odt", ".otf", ".oxt",
-		".pas", ".pdf", ".pl", ".ppd", ".ppt", ".pptx",
-		".rip", ".rpm",
-		".sh", ".spk", ".sql", ".sxg", ".sxw",
+		".pas", ".pdf", ".ppd", ".ppt", ".pptx",
+		".rip", ".rpm", ".spk", ".sxg", ".sxw",
 		".ttf", ".vbox", ".vmdk", ".vcs", ".wav",
 		".xls", ".xpi", ".xsl", ".zip":
 		return "", errors.New("Excluded filename extension: " + ext)
@@ -197,14 +196,13 @@ func CreateImage(aURL string) (string, error) {
 	} else if (nil != response) && (0 < response.ContentLength) {
 		_, err = io.Copy(file, response.Body)
 	} else {
+		_ = os.Remove(fName)
 		return "", errors.New("No image data received")
 	}
 
 	if nil != err {
 		// In case of errors during write we delete the file
 		// ignoring possible errors and return the write error.
-		_ = file.Close()
-		file = nil
 		_ = os.Remove(fName)
 		return "", err
 	}

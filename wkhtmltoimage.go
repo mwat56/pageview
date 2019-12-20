@@ -98,7 +98,10 @@ func cleanupOutput(aRawData []byte) []byte {
 	if 0 == len(aRawData) {
 		return aRawData
 	}
-	var buffer bytes.Buffer
+	var (
+		buffer bytes.Buffer
+		null   []byte // empty array
+	)
 
 	switch wkImageFileType {
 	case `gif`:
@@ -111,7 +114,10 @@ func cleanupOutput(aRawData []byte) []byte {
 		}
 		opts := gif.Options{NumColors: wkImageQuality}
 		_ = gif.Encode(&buffer, decoded, &opts)
-		return buffer.Bytes()
+		if 4096 < buffer.Len() {
+			return buffer.Bytes()
+		}
+		return null
 
 	case `jpg`:
 		decoded, err := jpeg.Decode(bytes.NewReader(aRawData))
@@ -123,7 +129,10 @@ func cleanupOutput(aRawData []byte) []byte {
 		}
 		opts := jpeg.Options{Quality: wkImageQuality}
 		_ = jpeg.Encode(&buffer, decoded, &opts)
-		return buffer.Bytes()
+		if 4096 < buffer.Len() {
+			return buffer.Bytes()
+		}
+		return null
 
 	case `png`:
 		decoded, err := png.Decode(bytes.NewReader(aRawData))
@@ -134,7 +143,10 @@ func cleanupOutput(aRawData []byte) []byte {
 			decoded, err = png.Decode(bytes.NewReader(aRawData))
 		}
 		_ = png.Encode(&buffer, decoded)
-		return buffer.Bytes()
+		if 4096 < buffer.Len() {
+			return buffer.Bytes()
+		}
+		return null
 
 	case `svg`:
 		// nothing to do here
@@ -167,7 +179,7 @@ func generateImage(aURL string) (rImage []byte, rErr error) {
 		if nil != rErr {
 			log.Println(wkHTMLToImageBinary, strings.Join(options, " "), rErr)
 		}
-		if rImage = cleanupOutput(rawData); 0 < len(rImage) {
+		if rImage = cleanupOutput(rawData); 4096 < len(rImage) {
 			rErr = nil
 		}
 	}
