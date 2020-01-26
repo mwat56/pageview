@@ -1,5 +1,5 @@
 /*
-   Copyright © 2019 M.Watermann, 10247 Berlin, Germany
+   Copyright © 2019, 2020 M.Watermann, 10247 Berlin, Germany
                   All rights reserved
               EMail : <support@mwat.de>
 */
@@ -69,7 +69,7 @@ var (
 	// R/O RegEx to find all non alpha/digits in URLs.
 	wkReplaceNonAlphasRE = regexp.MustCompile(`\W+`)
 
-	// User Agent to use when queing external sites.
+	// User Agent to use when queuing external sites.
 	wkUserAgent string
 )
 
@@ -227,9 +227,9 @@ func SetImageDirectory(aDirectory string) error {
 	}
 
 	return err
-} // SetImageeDirectory()
+} // SetImageDirectory()
 
-// ImageFileType returns the type of the image fles to generate.
+// ImageFileType returns the type of the image files to generate.
 func ImageFileType() string {
 	return wkImageFileType
 } // ImageFileType()
@@ -319,12 +319,12 @@ func JavaScript() bool {
 // retrieval or not.
 //
 //	`doAllow` If `false` (i.e. the default) no JavaScript will be available
-// during page retrievel, otherwise (i.e. `true`) it will be activated.
+// during page retrieval, otherwise (i.e. `true`) it will be activated.
 func SetJavaScript(doAllow bool) {
 	wkJavaScript = doAllow
 } // SetJavaScript()
 
-// MaxAge returns the maximimum age of cached page images.
+// MaxAge returns the maximum age of cached page images.
 func MaxAge() time.Duration {
 	return wkImageAge
 } // MaxAge()
