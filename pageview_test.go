@@ -1,5 +1,5 @@
 /*
-   Copyright © 2019 M.Watermann, 10247 Berlin, Germany
+   Copyright © 2019, 2020 M.Watermann, 10247 Berlin, Germany
                   All rights reserved
               EMail : <support@mwat.de>
 */
@@ -39,7 +39,7 @@ func Test_fileExt(t *testing.T) {
 } // Test_fileExt()
 
 func TestCreateImage(t *testing.T) {
-	SetImageDirectory("/tmp/")
+	_ = SetImageDirectory("/tmp/")
 	SetMaxAge(60)
 	SetImageFileType(`png`)
 	u1 := "http://dev.mwat.de/"
@@ -48,6 +48,7 @@ func TestCreateImage(t *testing.T) {
 	u3 := "http://www.mwat.de/index.pl"
 	n3 := sanitise(u3) + `.` + wkImageFileType
 	u4 := "http://bla.mwat.de/index.shtml"
+	n4 := sanitise(u4) + `.` + wkImageFileType
 
 	type args struct {
 		aURL string
@@ -62,7 +63,7 @@ func TestCreateImage(t *testing.T) {
 		{" 1", args{u1}, n1, false},
 		{" 2", args{u2}, "", true},
 		{" 3", args{u3}, n3, false},
-		{" 4", args{u4}, "", true},
+		{" 4", args{u4}, n4, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
