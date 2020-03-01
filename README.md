@@ -58,7 +58,7 @@ The returned string is the name of the generated image file.
 If you combine it with the directory returned by `CacheDirectory()` you get the complete path/filename to locally access the image.
 
 Generating a preview image usually takes between one and five seconds, depending on the actual web-page in question, however, it can take considerably longer.
-To avoid hanging the program the `wkhtmltoimage` utulity is called with an one minute timeout.
+To avoid hanging the program the `wkhtmltoimage` utility is called with an one minute timeout.
 
 And, finally, not all web-pages can be rendered properly and turned into an image.
 In such case `wkhtmltoimage` just crashes and `CreateImage()` doesn't return a filename but an error.
@@ -84,7 +84,7 @@ Part of the code (i.e. the file `wkhtmltoimage.go`) started as a modified versio
 
 ## Licence
 
-        Copyright © 2019 M.Watermann, 10247 Berlin, Germany
+        Copyright © 2019, 2020 M.Watermann, 10247 Berlin, Germany
                         All rights reserved
                     EMail : <support@mwat.de>
 
