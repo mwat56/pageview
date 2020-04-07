@@ -1,11 +1,12 @@
 /*
-   Copyright © 2019 M.Watermann, 10247 Berlin, Germany
+   Copyright © 2019, 2020 M.Watermann, 10247 Berlin, Germany
                   All rights reserved
               EMail : <support@mwat.de>
 */
 
 package pageview
 
+//lint:file-ignore ST1005 - Capitalisation wanted
 //lint:file-ignore ST1017 - I prefer Yoda conditions
 
 /*
@@ -47,45 +48,45 @@ func buildParams(aURL string) (rList []string, rErr error) {
 	if 0 == len(wkHTMLToImageBinary) {
 		return rList, errors.New("BinaryPath not set")
 	}
-	if 0 == len(aURL) { //lint:ignore ST1005 - I want this
+	if 0 == len(aURL) {
 		return rList, errors.New("Input not set")
 	}
 
 	rList = []string{
-		"--quiet",
-		"--disable-plugins",
-		"--disable-smart-width",
-		"--load-error-handling",
-		"ignore",
-		"--zoom",
-		"1.1",
-		"--format",
+		`--quiet`,
+		// `--disable-plugins`,
+		`--disable-smart-width`,
+		//		"--load-error-handling",
+		//		"ignore",
+		//		"--zoom",
+		//		"1.1",
+		`--format`,
 		wkImageFileType,
 	}
 	if 0 < len(wkUserAgent) {
 		// see: https://github.com/wkhtmltopdf/wkhtmltopdf/issues/2020
-		rList = append(rList, "--custom-header",
-			"User-Agent", wkUserAgent, "--custom-header-propagation")
+		rList = append(rList, `--custom-header`,
+			`User-Agent`, wkUserAgent, `--custom-header-propagation`)
 		// Unfortunately, there is no way to change the
 		// `navigator.userAgent` setting by a commandline argument.
 		// So sites requesting that value will still see
 		// `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/534.34 (KHTML, like Gecko) wkhtmltoimage Safari/534.34`.
 	}
 	if ucd, err := os.UserCacheDir(); (nil == err) && (0 < len(ucd)) {
-		rList = append(rList, "--cache-dir", ucd)
+		rList = append(rList, `--cache-dir`, ucd)
 	}
 	if 0 < wkImageHeight {
-		rList = append(rList, "--height", strconv.Itoa(wkImageHeight))
+		rList = append(rList, `--height`, strconv.Itoa(wkImageHeight))
 	}
 	if 0 < wkImageQuality {
-		rList = append(rList, "--quality", strconv.Itoa(wkImageQuality))
+		rList = append(rList, `--quality`, strconv.Itoa(wkImageQuality))
 	}
 	if 0 < wkImageWidth {
-		rList = append(rList, "--width", strconv.Itoa(wkImageWidth))
+		rList = append(rList, `--width`, strconv.Itoa(wkImageWidth))
 	}
 	rList = append(rList, wkLookupJS[wkJavaScript],
 		aURL, // the page to retrieve
-		"-")  // i.e. send data to StdOut
+		`-`)  // i.e. send data to StdOut
 
 	return
 } // buildParams()
