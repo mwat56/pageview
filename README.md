@@ -6,8 +6,8 @@
 [![Issues](https://img.shields.io/github/issues/mwat56/pageview.svg)](https://github.com/mwat56/pageview/issues?q=is%3Aopen+is%3Aissue)
 [![Size](https://img.shields.io/github/repo-size/mwat56/pageview.svg)](https://github.com/mwat56/pageview/)
 [![Tag](https://img.shields.io/github/tag/mwat56/pageview.svg)](https://github.com/mwat56/pageview/tags)
-[![View examples](https://img.shields.io/badge/learn%20by-examples-0077b3.svg)](https://github.com/mwat56/pageview/blob/master/app/pageview.go)
-[![License](https://img.shields.io/github/mwat56/pageview.svg)](https://github.com/mwat56/pageview/blob/master/LICENSE)
+[![View examples](https://img.shields.io/badge/learn%20by-examples-0077b3.svg)](https://github.com/mwat56/pageview/blob/main/app/pageview.go)
+[![License](https://img.shields.io/github/mwat56/pageview.svg)](https://github.com/mwat56/pageview/blob/main/LICENSE)
 
 - [PageView](#pageview)
 	- [Purpose](#purpose)
