@@ -38,24 +38,26 @@ After that you can `import` it the usual Go way to use the library.
 
 There are only two functions you have to worry about:
 
-	// SetCacheDirectory sets the directory to use for storing the
-	// generated images returning an error if `aDirectory` can't be used.
+	// SetImageDir sets the directory to use for storing the
+	// generated images, returning an error if `aDirectory` can't be used.
 	//
 	//	`aDirectory` The directory to store the generated images.
-	func SetCacheDirectory(aDirectory string) error { … }
+	func SetImageDir(aDirectory string) error { … }
 
 This function must be called before any other one to make sure the generated images end up where you want them to be.
+The default is the current directory from where the program was run.
 
 To actually create an image you'd call:
 
 	// CreateImage generates an image of `aURL` and stores it in
-	// `CacheDirectory` returning the file name of the saved image.
+	// `ImageDir()`, returning the file name of the saved image
+	// or an error in case of problems.
 	//
 	//	`aURL` The address of the web page to process.
 	func CreateImage(aURL string) (string, error) { … }
 
 The returned string is the name of the generated image file.
-If you combine it with the directory returned by `CacheDirectory()` you get the complete path/filename to locally access the image.
+If you combine it with the directory returned by `ImageDir()` you get the complete path/filename to locally access the image.
 
 Generating a preview image usually takes between one and five seconds, depending on the actual web-page in question, however, it can take considerably longer.
 To avoid hanging the program the `wkhtmltoimage` utility is called with an one minute timeout.
@@ -84,7 +86,7 @@ Part of the code (i.e. the file `wkhtmltoimage.go`) started as a modified versio
 
 ## Licence
 
-        Copyright © 2019, 2020 M.Watermann, 10247 Berlin, Germany
+        Copyright © 2019, 2022 M.Watermann, 10247 Berlin, Germany
                         All rights reserved
                     EMail : <support@mwat.de>
 

@@ -1,5 +1,5 @@
 /*
-   Copyright © 2019, 2020 M.Watermann, 10247 Berlin, Germany
+   Copyright © 2019, 2022 M.Watermann, 10247 Berlin, Germany
                   All rights reserved
               EMail : <support@mwat.de>
 */
@@ -27,7 +27,7 @@ const (
 )
 
 var (
-	// R/O RegEx to extract a file's extension.
+	// R/O RegEx to extract a filename's extension.
 	wkExtRE = regexp.MustCompile(`(\.\w+)([\?\#].*)?$`)
 
 	// Path/filename of the `wkhtmltoimage` executable.
@@ -52,7 +52,7 @@ var (
 
 	// Type/Format of the generated images.
 	// We use `PNG` format because it scales better.
-	wkImageFileType = `png`
+	wkImageType = `png`
 
 	// Height of the image to generate.
 	wkImageHeight = 768
@@ -137,7 +137,7 @@ func CreateImage(aURL string) (string, error) {
 		}
 	}
 
-	result := sanitise(aURL) + `.` + wkImageFileType
+	result := sanitise(aURL) + `.` + wkImageType
 	fName := filepath.Join(wkImageDirectory, result)
 	// Check whether we've already got an image so
 	// we might avoid additional network traffic:
@@ -175,6 +175,8 @@ func CreateImage(aURL string) (string, error) {
 			return "", err
 		}
 		defer response.Body.Close()
+		result = sanitise(aURL) + `.` + ext
+		fName = filepath.Join(wkImageDirectory, result)
 
 	default:
 		if imageData, err = generateImage(aURL); nil != err {
@@ -211,30 +213,30 @@ func CreateImage(aURL string) (string, error) {
 	return result, nil
 } // CreateImage()
 
-// ImageDirectory returns the directory used to store the generated images.
-func ImageDirectory() string {
+// ImageDir returns the directory used to store the generated images.
+func ImageDir() string {
 	return wkImageDirectory
 } // ImageDirectory()
 
-// SetImageDirectory sets the directory to use for storing the
+// SetImageDir sets the directory to use for storing the
 // generated images, returning an error if `aDirectory` can't be used.
 //
 //	`aDirectory` The directory to store the generated images.
-func SetImageDirectory(aDirectory string) error {
+func SetImageDir(aDirectory string) error {
 	dir, err := filepath.Abs(aDirectory)
 	if nil == err {
 		wkImageDirectory = dir
 	}
 
 	return err
-} // SetImageDirectory()
+} // SetImageDir()
 
 // ImageFileType returns the type of the image files to generate.
 func ImageFileType() string {
-	return wkImageFileType
+	return wkImageType
 } // ImageFileType()
 
-// SetImageFileType changes the type of the generated images.
+// SetImageType changes the type of the generated images.
 // The default type is `png`, the other options are `gif`, `jpg` and `svg`.
 // Passing an invalid value in `aType` will result in `png` being
 // selected.
@@ -243,14 +245,16 @@ func ImageFileType() string {
 // all formats might be supported.
 //
 //	`aType` is the new desired type of the images to generate.
-func SetImageFileType(aType string) {
+func SetImageType(aType string) {
 	switch aType {
 	case `gif`, `jpg`, `png`, `svg`:
-		wkImageFileType = aType
+		wkImageType = aType
+	case `jpeg`:
+		wkImageType = `jpg`
 	default:
-		wkImageFileType = `png`
+		wkImageType = `png`
 	}
-} // SetImageFileType()
+} // SetImageType()
 
 // ImageHeight is the height in pixels of the imaginary screen used to render.
 // The default value is `768`.
@@ -278,7 +282,7 @@ func ImageQuality() int {
 	return wkImageQuality
 } // ImageQuality
 
-// SetImageQuality changes the quality of the genereated image.
+// SetImageQuality changes the quality of the image to be generated.
 // Values supported between `1` and `100`; default is `100`.
 //
 //	`aQuality` the new desired image quality.
@@ -355,7 +359,7 @@ func SetMaxAge(aLengthInSeconds time.Duration) {
 //	`aURL` The address of the web page to process.
 func PathFile(aURL string) string {
 	return filepath.Join(wkImageDirectory,
-		sanitise(aURL)+`.`+wkImageFileType)
+		sanitise(aURL)+`.`+wkImageType)
 } // PathFile()
 
 // UserAgent returns the current `User Agent` setting.

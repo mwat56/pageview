@@ -1,5 +1,5 @@
 /*
-   Copyright © 2019, 2020 M.Watermann, 10247 Berlin, Germany
+   Copyright © 2019, 2022 M.Watermann, 10247 Berlin, Germany
                   All rights reserved
               EMail : <support@mwat.de>
 */
@@ -24,7 +24,6 @@ import (
 	"image/jpeg"
 	"image/png"
 	"log"
-	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -61,7 +60,7 @@ func buildParams(aURL string) (rList []string, rErr error) {
 		//		"--zoom",
 		//		"1.1",
 		`--format`,
-		wkImageFileType,
+		wkImageType,
 	}
 	if 0 < len(wkUserAgent) {
 		// see: https://github.com/wkhtmltopdf/wkhtmltopdf/issues/2020
@@ -72,9 +71,10 @@ func buildParams(aURL string) (rList []string, rErr error) {
 		// So sites requesting that value will still see
 		// `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/534.34 (KHTML, like Gecko) wkhtmltoimage Safari/534.34`.
 	}
-	if ucd, err := os.UserCacheDir(); (nil == err) && (0 < len(ucd)) {
-		rList = append(rList, `--cache-dir`, ucd)
-	}
+	// if ucd, err := os.UserCacheDir(); (nil == err) && (0 < len(ucd)) {
+	// 	rList = append(rList, `--cache-dir`, ucd)
+	// }
+	rList = append(rList, `--cache-dir`, `/dev/null`)
 	if 0 < wkImageHeight {
 		rList = append(rList, `--height`, strconv.Itoa(wkImageHeight))
 	}
@@ -104,7 +104,7 @@ func cleanupOutput(aRawData []byte) []byte {
 		null   []byte // empty array
 	)
 
-	switch wkImageFileType {
+	switch wkImageType {
 	case `gif`:
 		decoded, err := gif.Decode(bytes.NewReader(aRawData))
 		for nil != err {
@@ -165,7 +165,7 @@ func generateImage(aURL string) (rImage []byte, rErr error) {
 		options []string
 		rawData []byte
 	)
-	if options, rErr = buildParams(aURL); rErr != nil {
+	if options, rErr = buildParams(aURL); nil != rErr {
 		return
 	}
 
