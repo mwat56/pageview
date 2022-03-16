@@ -3,7 +3,6 @@
                   All rights reserved
               EMail : <support@mwat.de>
 */
-
 package pageview
 
 //lint:file-ignore ST1017 - I prefer Yoda conditions
