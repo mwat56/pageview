@@ -22,7 +22,7 @@
 
 ## Purpose
 
-Sometimes yoo don't want just standard web links in your web pages but a preview image showing the page you`re linking to. That is where this small package comes in. It generates – by way of calling the external [wkhtmltoimage](https://wkhtmltopdf.org/index.html) commandline utility – an image of the web page a given URL addresses. Those image files are stored locally and may be used as often as you want.
+Sometimes you don't want just standard web links in your web pages but a preview image showing the page you are linking to. That is where this small package comes in. It generates - by way of calling the external [wkhtmltoimage](https://wkhtmltopdf.org/index.html) commandline utility - an image of the web page a given URL addresses. Those image files are stored locally and may be used as often as you want.
 
 ## Installation
 
@@ -40,7 +40,7 @@ There are only two functions you have to worry about:
 	// generated images, returning an error if `aDirectory` can't be used.
 	//
 	//	`aDirectory` The directory to store the generated images.
-	func SetImageDir(aDirectory string) error { … }
+	func SetImageDir(aDirectory string) error { ... }
 
 This function must be called before any other one to make sure the generated images end up where you want them to be. The default is the current directory from where the program was run.
 
@@ -51,7 +51,7 @@ To actually create an image you'd call:
 	// or an error in case of problems.
 	//
 	//	`aURL` The address of the web page to process.
-	func CreateImage(aURL string) (string, error) { … }
+	func CreateImage(aURL string) (string, error) { ... }
 
 The returned string is the name of the generated image file. If you combine it with the directory returned by `ImageDir()` you get the complete path/filename to locally access the image.
 
